@@ -1,11 +1,32 @@
 #include "Engine.h"
 
-Engine::Engine()
+bool Engine::Init()
 {
-    //ctor
+
 }
 
-Engine::~Engine()
+bool Engine::Clean()
 {
-    //dtor
+
 }
+
+void Engine::Quit()
+{
+
+}
+
+void Engine::Update(float dt)
+{
+
+}
+
+void Engine::Render()
+{
+
+}
+
+void Engine::Events()
+{
+
+}
+

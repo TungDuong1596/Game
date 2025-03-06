@@ -15,6 +15,7 @@
 					<Add option="-g" />
 					<Add directory="src/Core/" />
 					<Add directory="Core" />
+					<Add directory="src/Core" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -26,6 +27,7 @@
 					<Add option="-O2" />
 					<Add directory="src/Core/" />
 					<Add directory="Core" />
+					<Add directory="src/Core" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -36,9 +38,9 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="Core/Engine.cpp" />
-		<Unit filename="Core/Engine.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/Core/Engine.cpp" />
+		<Unit filename="src/Core/Engine.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>
