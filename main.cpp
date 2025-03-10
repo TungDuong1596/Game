@@ -5,12 +5,13 @@
 #include <cmath>
 #include <algorithm>
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH = 1600;
+const int SCREEN_HEIGHT = 900;
 const int PLAYER_SIZE = 40;
 const int PLAYER_SPEED = 5;
 const float GRAVITY = 0.5f;  // Trọng lực
-const float JUMP_FORCE = -10.0f; // Lực nhảy
+const float JUMP_FORCE = -15.0f; // Lực nhảy
+a
 
 struct Entity {
     float x, y;
@@ -78,7 +79,7 @@ int main(int argc, char* argv[]) {
         SDL_RenderClear(renderer);
 
         // Vẽ người chơi
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 216, 191, 216, 255);
         SDL_Rect playerRect = {(int)player.x, (int)player.y, PLAYER_SIZE, PLAYER_SIZE};
         SDL_RenderFillRect(renderer, &playerRect);
 
