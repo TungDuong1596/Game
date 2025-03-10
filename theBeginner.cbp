@@ -16,7 +16,6 @@
 					<Add directory="src/Core/" />
 					<Add directory="Core" />
 					<Add directory="src/Core" />
-					<Add directory="src/Graphics" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -29,7 +28,6 @@
 					<Add directory="src/Core/" />
 					<Add directory="Core" />
 					<Add directory="src/Core" />
-					<Add directory="src/Graphics" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -41,10 +39,6 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="main.cpp" />
-		<Unit filename="src/Core/Engine.cpp" />
-		<Unit filename="src/Core/Engine.h" />
-		<Unit filename="src/Graphics/TextureManager.cpp" />
-		<Unit filename="src/Graphics/TextureManager.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>
