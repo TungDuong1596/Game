@@ -5,7 +5,7 @@
 #include <cmath>
 #include <algorithm>
 
-const int SCREEN_WIDTH = 1600;
+const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 900;
 const int PLAYER_SIZE = 40;
 const int PLAYER_SPEED = 5;
