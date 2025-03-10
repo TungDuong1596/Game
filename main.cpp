@@ -1,4 +1,3 @@
-#include "Engine.h"
 #include <SDL.h>
 #include <vector>
 #include <cstdlib>
@@ -10,17 +9,37 @@ const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 const int PLAYER_SIZE = 40;
 const int PLAYER_SPEED = 5;
+const float GRAVITY = 0.5f;  // Trọng lực
+const float JUMP_FORCE = -10.0f; // Lực nhảy
 
 struct Entity {
-    int x, y;
+    float x, y;
+    float velocity_y = 0.0f; // Vận tốc rơi
+    bool isGrounded = false; // Kiểm tra nếu đang chạm đất
 };
 
 int main(int argc, char* argv[]) {
-    SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window* window = SDL_CreateWindow("Move Player", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        SDL_Log("SDL could not initialize! SDL_Error: %s", SDL_GetError());
+        return -1;
+    }
 
-    Entity player = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
+    SDL_Window* window = SDL_CreateWindow("Move Player with Gravity", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    if (!window) {
+        SDL_Log("Window could not be created! SDL_Error: %s", SDL_GetError());
+        SDL_Quit();
+        return -1;
+    }
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!renderer) {
+        SDL_Log("Renderer could not be created! SDL_Error: %s", SDL_GetError());
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
+
+    Entity player = {SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f};
 
     bool running = true;
     SDL_Event event;
@@ -30,18 +49,29 @@ int main(int argc, char* argv[]) {
             if (event.type == SDL_QUIT) running = false;
         }
 
-// Di chuyển nhân vật người chơi với giới hạn biên
-const Uint8* keys = SDL_GetKeyboardState(NULL);
-if (keys[SDL_SCANCODE_W] && player.y - PLAYER_SPEED > PLAYER_SIZE)
-    player.y -= PLAYER_SPEED;
-if (keys[SDL_SCANCODE_S] && player.y + PLAYER_SPEED < SCREEN_HEIGHT - PLAYER_SIZE)
-    player.y += PLAYER_SPEED;
-if (keys[SDL_SCANCODE_A] && player.x - PLAYER_SPEED > PLAYER_SIZE)
-    player.x -= PLAYER_SPEED;
-if (keys[SDL_SCANCODE_D] && player.x + PLAYER_SPEED < SCREEN_WIDTH - PLAYER_SIZE)
-    player.x += PLAYER_SPEED;
+        // Nhận phím điều khiển
+        const Uint8* keys = SDL_GetKeyboardState(NULL);
+        if (keys[SDL_SCANCODE_A] && player.x - PLAYER_SPEED >= 0)
+            player.x -= PLAYER_SPEED;
+        if (keys[SDL_SCANCODE_D] && player.x + PLAYER_SIZE + PLAYER_SPEED <= SCREEN_WIDTH)
+            player.x += PLAYER_SPEED;
 
+        // Nhảy nếu đang đứng trên mặt đất
+        if (keys[SDL_SCANCODE_SPACE] && player.isGrounded) {
+            player.velocity_y = JUMP_FORCE; // Nhảy lên
+            player.isGrounded = false;
+        }
 
+        // Áp dụng trọng lực
+        player.velocity_y += GRAVITY;
+        player.y += player.velocity_y;
+
+        // Va chạm với mặt đất
+        if (player.y + PLAYER_SIZE >= SCREEN_HEIGHT) {
+            player.y = SCREEN_HEIGHT - PLAYER_SIZE; // Giữ thực thể trên mặt đất
+            player.velocity_y = 0; // Dừng rơi
+            player.isGrounded = true;
+        }
 
         // Vẽ màn hình
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -49,7 +79,7 @@ if (keys[SDL_SCANCODE_D] && player.x + PLAYER_SPEED < SCREEN_WIDTH - PLAYER_SIZE
 
         // Vẽ người chơi
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_Rect playerRect = {player.x - PLAYER_SIZE / 2, player.y - PLAYER_SIZE / 2, PLAYER_SIZE, PLAYER_SIZE};
+        SDL_Rect playerRect = {(int)player.x, (int)player.y, PLAYER_SIZE, PLAYER_SIZE};
         SDL_RenderFillRect(renderer, &playerRect);
 
         SDL_RenderPresent(renderer);
@@ -61,4 +91,3 @@ if (keys[SDL_SCANCODE_D] && player.x + PLAYER_SPEED < SCREEN_WIDTH - PLAYER_SIZE
     SDL_Quit();
     return 0;
 }
-
