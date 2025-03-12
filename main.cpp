@@ -8,12 +8,12 @@
 #include <string>
 
 const int SCREEN_WIDTH = 1200;
-const int SCREEN_HEIGHT = 900;
+const int SCREEN_HEIGHT = 600;
 const int PLAYER_SIZE = 40;
 const int PLAYER_SPEED = 5;
 const float GRAVITY = 0.5f;
-const float JUMP_FORCE = -25.0f;
-const int DASH_SPEED = 50;
+const float JUMP_FORCE = -15.0f;
+const int DASH_SPEED = 60;
 const int DASH_DURATION = 10;
 const int DASH_COOLDOWN = 1800; // 30 giây (60 FPS * 30)
 
