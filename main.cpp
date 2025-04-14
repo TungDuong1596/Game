@@ -40,8 +40,8 @@ struct Player {
     }
 
     void update() {
-        y += 2;
-        if (y > SCREEN_HEIGHT) y = -PLAYER_HEIGHT;
+        y -= 2;
+        if (y < -PLAYER_HEIGHT) y = SCREEN_HEIGHT;
     }
 
     void draw() {
