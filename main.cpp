@@ -85,7 +85,7 @@ int main(int argc, char* args[]) {
 
     wallTexture = loadTexture("wall.jpg");
     backgroundTexture = loadTexture("background.jpg");
-    ninjaTexture = loadTexture("ninja.png");
+    ninjaTexture = loadTexture("ninja3.png");
 
     if (!backgroundTexture || !ninjaTexture || !wallTexture) {
         close();
