@@ -1,39 +1,53 @@
 #include <SDL.h>
+#include <SDL_image.h>
 #include <iostream>
 
 const int SCREEN_WIDTH = 480;
 const int SCREEN_HEIGHT = 800;
-const int PLAYER_WIDTH = 40;
-const int PLAYER_HEIGHT = 40;
-const int WALL_WIDTH = 50;
+const int PLAYER_WIDTH = 50;
+const int PLAYER_HEIGHT = 50;
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
+SDL_Texture* backgroundTexture = nullptr;
+SDL_Texture* ninjaTexture = nullptr;
+SDL_Texture* wallTexture = nullptr;
+
+SDL_Texture* loadTexture(const char* path) {
+    SDL_Surface* loadedSurface = IMG_Load(path);
+    if (!loadedSurface) {
+        std::cout << "IMG_Load failed: " << IMG_GetError() << "\n";
+        return nullptr;
+    }
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+    SDL_FreeSurface(loadedSurface);
+    return tex;
+}
 
 struct Player {
     int x, y;
     bool onLeftWall;
 
     Player() {
-        x = WALL_WIDTH;
+        x = 50;
         y = SCREEN_HEIGHT - 100;
         onLeftWall = true;
     }
 
     void jump() {
         onLeftWall = !onLeftWall;
-        x = onLeftWall ? WALL_WIDTH : SCREEN_WIDTH - WALL_WIDTH - PLAYER_WIDTH;
+        x = onLeftWall ? 50 : SCREEN_WIDTH - 50 - PLAYER_WIDTH;
     }
 
     void update() {
-        y -= 2; // Tự động leo lên
-        if (y < -PLAYER_HEIGHT) y = SCREEN_HEIGHT; // reset về dưới nếu quá đỉnh
+        y += 2;
+        if (y > SCREEN_HEIGHT) y = -PLAYER_HEIGHT;
     }
 
     void draw() {
         SDL_Rect rect = { x, y, PLAYER_WIDTH, PLAYER_HEIGHT };
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // đỏ
-        SDL_RenderFillRect(renderer, &rect);
+        SDL_RendererFlip flip = onLeftWall ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+        SDL_RenderCopyEx(renderer, ninjaTexture, nullptr, &rect, 0, nullptr, flip);
     }
 };
 
@@ -43,7 +57,12 @@ bool init() {
         return false;
     }
 
-    window = SDL_CreateWindow("NinJump SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+        std::cout << "SDL_image init failed: " << IMG_GetError() << "\n";
+        return false;
+    }
+
+    window = SDL_CreateWindow("Cute NinJump", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (!window) return false;
 
@@ -52,13 +71,29 @@ bool init() {
 }
 
 void close() {
+    SDL_DestroyTexture(backgroundTexture);
+    SDL_DestroyTexture(ninjaTexture);
+    SDL_DestroyTexture(wallTexture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    IMG_Quit();
     SDL_Quit();
 }
 
 int main(int argc, char* args[]) {
     if (!init()) return -1;
+
+    wallTexture = loadTexture("wall.jpg");
+    backgroundTexture = loadTexture("background.jpg");
+    ninjaTexture = loadTexture("ninja.png");
+
+    if (!backgroundTexture || !ninjaTexture || !wallTexture) {
+        close();
+        return -1;
+    }
+
+    int wallTextureWidth, wallTextureHeight;
+    SDL_QueryTexture(wallTexture, nullptr, nullptr, &wallTextureWidth, &wallTextureHeight);
 
     bool quit = false;
     SDL_Event e;
@@ -74,23 +109,23 @@ int main(int argc, char* args[]) {
 
         player.update();
 
-        // Clear screen
-        SDL_SetRenderDrawColor(renderer, 200, 200, 255, 255); // màu nền
         SDL_RenderClear(renderer);
 
-        // Draw walls
-        SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
-        SDL_Rect leftWall = { 0, 0, WALL_WIDTH, SCREEN_HEIGHT };
-        SDL_Rect rightWall = { SCREEN_WIDTH - WALL_WIDTH, 0, WALL_WIDTH, SCREEN_HEIGHT };
-        SDL_RenderFillRect(renderer, &leftWall);
-        SDL_RenderFillRect(renderer, &rightWall);
+        SDL_Rect leftWallRect = { 0, 0, 50, SCREEN_HEIGHT };
+        SDL_Rect leftWallSrcRect = { 0, 0, 50, wallTextureHeight };
+        SDL_RenderCopy(renderer, wallTexture, &leftWallSrcRect, &leftWallRect);
 
-        // Draw player
+        SDL_Rect rightWallRect = { SCREEN_WIDTH - 50, 0, 50, SCREEN_HEIGHT };
+        SDL_Rect rightWallSrcRect = { wallTextureWidth - 50, 0, 50, wallTextureHeight };
+        SDL_RenderCopy(renderer, wallTexture, &rightWallSrcRect, &rightWallRect);
+
+        SDL_Rect backgroundRect = { 50, 0, SCREEN_WIDTH - 100, SCREEN_HEIGHT };
+        SDL_RenderCopy(renderer, backgroundTexture, nullptr, &backgroundRect);
+
         player.draw();
 
-        // Update screen
         SDL_RenderPresent(renderer);
-        SDL_Delay(16); // ~60fps
+        SDL_Delay(12);
     }
 
     close();
