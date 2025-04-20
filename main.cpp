@@ -8,13 +8,15 @@
 
 const int SCREEN_WIDTH = 480;
 const int SCREEN_HEIGHT = 800;
-const int PLAYER_WIDTH = 42;
-const int PLAYER_HEIGHT = 66;
+const int PLAYER_WIDTH = 28;
+const int PLAYER_HEIGHT = 44;
 const int PLATFORM_WIDTH = 25;
 const int PLATFORM_HEIGHT = 25;
 const int WALL_WIDTH = 50;
 const int GRAVITY = 1;
 const int JUMP_FORCE = -20;
+const int HEART_SIZE = 32;
+const int HEART_PADDING = 10;
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
@@ -22,6 +24,7 @@ SDL_Texture* backgroundTexture = nullptr;
 SDL_Texture* ninjaTexture = nullptr;
 SDL_Texture* wallTexture = nullptr;
 SDL_Texture* platformTexture = nullptr;
+SDL_Texture* heartTexture = nullptr;
 
 struct Platform {
     SDL_Rect rect;
@@ -40,6 +43,12 @@ struct Player {
     bool isJumping;
     bool isAttached;
     int score;
+    float scoreMultiplier;
+    Uint32 lastMultiplierIncreaseTime;
+    int lives;
+    bool isInvincible;
+    Uint32 invincibleTime;
+    int targetY;
 
     Player()
         : x(WALL_WIDTH),
@@ -48,7 +57,13 @@ struct Player {
         onLeftWall(true),
         isJumping(false),
         isAttached(true),
-        score(0) {}
+        score(0),
+        scoreMultiplier(1.0f),
+        lastMultiplierIncreaseTime(SDL_GetTicks()),
+        lives(3),
+        isInvincible(false),
+        invincibleTime(0),
+        targetY(SCREEN_HEIGHT - 100 - PLAYER_HEIGHT) {}
 
     void jump() {
         if (isAttached) {
@@ -56,6 +71,7 @@ struct Player {
             onLeftWall = !onLeftWall;
             velocityY = JUMP_FORCE;
             isJumping = true;
+            targetY = y;
         }
     }
 
@@ -64,39 +80,54 @@ struct Player {
             velocityY += GRAVITY;
             y += velocityY;
 
-            if (onLeftWall) {
-                if (x > WALL_WIDTH) {
-                    x = WALL_WIDTH;
-                    isAttached = true;
-                    velocityY = 0;
-                    isJumping = false;
-                }
-            }
-            else {
-                if (x < SCREEN_WIDTH - WALL_WIDTH - PLAYER_WIDTH) {
-                    x = SCREEN_WIDTH - WALL_WIDTH - PLAYER_WIDTH;
-                    isAttached = true;
-                    velocityY = 0;
-                    isJumping = false;
-                }
+            if ((velocityY > 0 && y >= targetY) || (velocityY < 0 && y <= targetY)) {
+                y = targetY;
+                isAttached = true;
+                velocityY = 0;
+                isJumping = false;
+                x = onLeftWall ? WALL_WIDTH : SCREEN_WIDTH - WALL_WIDTH - PLAYER_WIDTH;
             }
         }
 
-        x = onLeftWall ? WALL_WIDTH : SCREEN_WIDTH - WALL_WIDTH - PLAYER_WIDTH;
-
         if (y > SCREEN_HEIGHT) {
             reset();
+        }
+
+        Uint32 currentTime = SDL_GetTicks();
+        if (currentTime - lastMultiplierIncreaseTime > 10000) {
+            scoreMultiplier += 0.5f;
+            lastMultiplierIncreaseTime = currentTime;
+        }
+
+        if (isInvincible && currentTime > invincibleTime) {
+            isInvincible = false;
         }
     }
 
     void reset() {
         y = SCREEN_HEIGHT - 100 - PLAYER_HEIGHT;
+        targetY = y;
         x = WALL_WIDTH;
         velocityY = 0;
         onLeftWall = true;
         isJumping = false;
         isAttached = true;
         score = 0;
+        scoreMultiplier = 1.0f;
+        lastMultiplierIncreaseTime = SDL_GetTicks();
+        lives = 3;
+        isInvincible = false;
+    }
+
+    void resetPosition() {
+        y = SCREEN_HEIGHT - 100 - PLAYER_HEIGHT;
+        targetY = y;
+        x = onLeftWall ? WALL_WIDTH : SCREEN_WIDTH - WALL_WIDTH - PLAYER_WIDTH;
+        velocityY = 0;
+        isAttached = true;
+        isJumping = false;
+        isInvincible = true;
+        invincibleTime = SDL_GetTicks() + 2000;
     }
 
     void draw() {
@@ -157,6 +188,7 @@ void close() {
     SDL_DestroyTexture(ninjaTexture);
     SDL_DestroyTexture(wallTexture);
     SDL_DestroyTexture(platformTexture);
+    SDL_DestroyTexture(heartTexture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     IMG_Quit();
@@ -170,15 +202,27 @@ bool checkCollision(const SDL_Rect& a, const SDL_Rect& b) {
         a.y + a.h > b.y);
 }
 
-void renderScore(int score, TTF_Font* font, SDL_Renderer* renderer) {
+void renderScore(int score, float multiplier, TTF_Font* font, SDL_Renderer* renderer) {
     SDL_Color color = { 255, 255, 255 };
-    std::string scoreText = "Score: " + std::to_string(score);
+    std::string scoreText = "Score: " + std::to_string(score) + " (x" + std::to_string(multiplier).substr(0, 3) + ")";
     SDL_Surface* surface = TTF_RenderText_Solid(font, scoreText.c_str(), color);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_Rect rect = { 10, 10, surface->w, surface->h };
     SDL_FreeSurface(surface);
     SDL_RenderCopy(renderer, texture, nullptr, &rect);
     SDL_DestroyTexture(texture);
+}
+
+void renderLives(int lives, SDL_Renderer* renderer, SDL_Texture* heartTexture) {
+    for (int i = 0; i < lives; i++) {
+        SDL_Rect heartRect = {
+            SCREEN_WIDTH - (i + 1) * (HEART_SIZE + HEART_PADDING),
+            HEART_PADDING,
+            HEART_SIZE,
+            HEART_SIZE
+        };
+        SDL_RenderCopy(renderer, heartTexture, nullptr, &heartRect);
+    }
 }
 
 void renderGameOver(TTF_Font* font, SDL_Renderer* renderer) {
@@ -196,10 +240,11 @@ int main(int argc, char* args[]) {
 
     wallTexture = loadTexture("wall.png");
     backgroundTexture = loadTexture("background.png");
-    ninjaTexture = loadTexture("ninja.png"); // Ảnh tĩnh của nhân vật
+    ninjaTexture = loadTexture("ninja.png");
     platformTexture = loadTexture("platform.png");
+    heartTexture = loadTexture("heart.gif");
 
-    if (!wallTexture || !backgroundTexture || !ninjaTexture || !platformTexture) {
+    if (!wallTexture || !backgroundTexture || !ninjaTexture || !platformTexture || !heartTexture) {
         close();
         return -1;
     }
@@ -229,6 +274,11 @@ int main(int argc, char* args[]) {
     Uint32 lastTime = SDL_GetTicks();
     const Uint32 frameDelay = 16;
 
+    float platformSpeed = 3.0f;
+    float speedIncreaseRate = 0.005f;
+    float maxSpeed = 10.0f;
+    int spawnChance = 5;
+
     while (!quit) {
         Uint32 currentTime = SDL_GetTicks();
         Uint32 deltaTime = currentTime - lastTime;
@@ -246,15 +296,23 @@ int main(int argc, char* args[]) {
         if (!gameOver) {
             player.update();
 
-            for (auto& p : platforms) {
-                if (checkCollision(player.getRect(), p.rect)) {
-                    gameOver = true;
-                    break;
+            if (!player.isInvincible) {
+                for (auto& p : platforms) {
+                    if (checkCollision(player.getRect(), p.rect)) {
+                        player.lives--;
+                        if (player.lives > 0) {
+                            player.resetPosition();
+                        } else {
+                            gameOver = true;
+                        }
+                        break;
+                    }
                 }
             }
 
+            spawnChance = 5 + static_cast<int>(player.score / 100);
             if (platforms.empty() || platforms.back().rect.y > -PLATFORM_HEIGHT) {
-                if (rand() % 100 < 5) {
+                if (rand() % 100 < spawnChance) {
                     bool leftSide = (rand() % 2 == 0);
                     int x = leftSide ? WALL_WIDTH : SCREEN_WIDTH - WALL_WIDTH - PLATFORM_WIDTH;
                     int y = platforms.empty() ? -PLATFORM_HEIGHT : platforms.back().rect.y - 150;
@@ -264,11 +322,15 @@ int main(int argc, char* args[]) {
 
             if (!platforms.empty() && platforms.front().rect.y > SCREEN_HEIGHT) {
                 platforms.erase(platforms.begin());
-                player.score++;
+                player.score += static_cast<int>(player.scoreMultiplier);
+            }
+
+            if (platformSpeed < maxSpeed) {
+                platformSpeed += speedIncreaseRate;
             }
 
             for (auto& p : platforms) {
-                p.rect.y += 3;
+                p.rect.y += static_cast<int>(platformSpeed);
             }
         }
 
@@ -289,7 +351,8 @@ int main(int argc, char* args[]) {
 
         player.draw();
 
-        renderScore(player.score, font, renderer);
+        renderScore(player.score, player.scoreMultiplier, font, renderer);
+        renderLives(player.lives, renderer, heartTexture);
 
         if (gameOver) {
             renderGameOver(font, renderer);
