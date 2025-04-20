@@ -4,10 +4,14 @@
 	<SDL.h>
 	<SDL_image.h>
 
-1744662027 source:c:\users\duong\onedrive\documents\github\game\main.cpp
+1745165554 source:c:\users\duong\onedrive\documents\github\game\main.cpp
 	<SDL.h>
 	<SDL_image.h>
+	<SDL_ttf.h>
 	<iostream>
+	<vector>
+	<ctime>
+	<string>
 
 1741623066 c:\users\duong\onedrive\documents\github\game\src\core\\engine.h
 
