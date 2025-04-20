@@ -8,8 +8,8 @@
 
 const int SCREEN_WIDTH = 480;
 const int SCREEN_HEIGHT = 800;
-const int PLAYER_WIDTH = 50;
-const int PLAYER_HEIGHT = 50;
+const int PLAYER_WIDTH = 42;
+const int PLAYER_HEIGHT = 66;
 const int PLATFORM_WIDTH = 25;
 const int PLATFORM_HEIGHT = 25;
 const int WALL_WIDTH = 50;
@@ -41,39 +41,14 @@ struct Player {
     bool isAttached;
     int score;
 
-    std::vector<SDL_Rect> animationFrames;
-    int currentFrame;
-    Uint32 frameTime;
-    Uint32 animationSpeed;
-
     Player()
         : x(WALL_WIDTH),
-        y(SCREEN_HEIGHT - 100),
+        y(SCREEN_HEIGHT - 100 - PLAYER_HEIGHT),
         velocityY(0),
         onLeftWall(true),
         isJumping(false),
         isAttached(true),
-        score(0),
-        currentFrame(0),
-        frameTime(0),
-        animationSpeed(100) {
-        initAnimation();
-    }
-
-    void initAnimation() {
-        int totalFrames = 8;
-        for (int i = 0; i < totalFrames; i++) {
-            animationFrames.push_back({0, i * PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT});
-        }
-    }
-
-    void updateAnimation() {
-        Uint32 currentTime = SDL_GetTicks();
-        if (currentTime - frameTime > animationSpeed) {
-            frameTime = currentTime;
-            currentFrame = (currentFrame + 1) % animationFrames.size();
-        }
-    }
+        score(0) {}
 
     void jump() {
         if (isAttached) {
@@ -81,7 +56,6 @@ struct Player {
             onLeftWall = !onLeftWall;
             velocityY = JUMP_FORCE;
             isJumping = true;
-            animationSpeed = 50;
         }
     }
 
@@ -96,7 +70,6 @@ struct Player {
                     isAttached = true;
                     velocityY = 0;
                     isJumping = false;
-                    animationSpeed = 100;
                 }
             }
             else {
@@ -105,7 +78,6 @@ struct Player {
                     isAttached = true;
                     velocityY = 0;
                     isJumping = false;
-                    animationSpeed = 100;
                 }
             }
         }
@@ -118,21 +90,19 @@ struct Player {
     }
 
     void reset() {
-        y = SCREEN_HEIGHT - 100;
+        y = SCREEN_HEIGHT - 100 - PLAYER_HEIGHT;
         x = WALL_WIDTH;
         velocityY = 0;
         onLeftWall = true;
         isJumping = false;
         isAttached = true;
         score = 0;
-        currentFrame = 0;
-        animationSpeed = 100;
     }
 
     void draw() {
         SDL_Rect destRect = { x, y, PLAYER_WIDTH, PLAYER_HEIGHT };
         SDL_RendererFlip flip = onLeftWall ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
-        SDL_RenderCopyEx(renderer, ninjaTexture, &animationFrames[currentFrame], &destRect, 0, nullptr, flip);
+        SDL_RenderCopyEx(renderer, ninjaTexture, nullptr, &destRect, 0, nullptr, flip);
     }
 
     SDL_Rect getRect() const {
@@ -226,7 +196,7 @@ int main(int argc, char* args[]) {
 
     wallTexture = loadTexture("wall.png");
     backgroundTexture = loadTexture("background.png");
-    ninjaTexture = loadTexture("ninja2.png");
+    ninjaTexture = loadTexture("ninja.png"); // Ảnh tĩnh của nhân vật
     platformTexture = loadTexture("platform.png");
 
     if (!wallTexture || !backgroundTexture || !ninjaTexture || !platformTexture) {
@@ -275,7 +245,6 @@ int main(int argc, char* args[]) {
 
         if (!gameOver) {
             player.update();
-            player.updateAnimation();
 
             for (auto& p : platforms) {
                 if (checkCollision(player.getRect(), p.rect)) {
