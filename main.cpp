@@ -41,7 +41,6 @@ struct Player {
     bool isAttached;
     int score;
 
-    // Animation properties
     std::vector<SDL_Rect> animationFrames;
     int currentFrame;
     Uint32 frameTime;
@@ -62,7 +61,6 @@ struct Player {
     }
 
     void initAnimation() {
-        // Giả sử sprite sheet có 8 frame, mỗi frame cao 50px
         int totalFrames = 8;
         for (int i = 0; i < totalFrames; i++) {
             animationFrames.push_back({0, i * PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT});
@@ -83,7 +81,6 @@ struct Player {
             onLeftWall = !onLeftWall;
             velocityY = JUMP_FORCE;
             isJumping = true;
-            // Tăng tốc độ animation khi nhảy
             animationSpeed = 50;
         }
     }
@@ -93,14 +90,12 @@ struct Player {
             velocityY += GRAVITY;
             y += velocityY;
 
-            // Check wall collision
             if (onLeftWall) {
                 if (x > WALL_WIDTH) {
                     x = WALL_WIDTH;
                     isAttached = true;
                     velocityY = 0;
                     isJumping = false;
-                    // Trở lại tốc độ animation bình thường
                     animationSpeed = 100;
                 }
             }
@@ -110,7 +105,6 @@ struct Player {
                     isAttached = true;
                     velocityY = 0;
                     isJumping = false;
-                    // Trở lại tốc độ animation bình thường
                     animationSpeed = 100;
                 }
             }
@@ -153,7 +147,6 @@ SDL_Texture* loadTexture(const char* path) {
         return nullptr;
     }
 
-    // Chuyển đổi sang định dạng phù hợp với alpha channel
     SDL_Surface* converted = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_RGBA8888, 0);
     SDL_FreeSurface(surf);
 
@@ -231,10 +224,9 @@ void renderGameOver(TTF_Font* font, SDL_Renderer* renderer) {
 int main(int argc, char* args[]) {
     if (!init()) return -1;
 
-    // Load textures
     wallTexture = loadTexture("wall.png");
     backgroundTexture = loadTexture("background.png");
-    ninjaTexture = loadTexture("ninja2.png"); // Sử dụng sprite sheet
+    ninjaTexture = loadTexture("ninja2.png");
     platformTexture = loadTexture("platform.png");
 
     if (!wallTexture || !backgroundTexture || !ninjaTexture || !platformTexture) {
@@ -242,7 +234,6 @@ int main(int argc, char* args[]) {
         return -1;
     }
 
-    // Initialize TTF for text rendering
     if (TTF_Init() == -1) {
         std::cerr << "TTF_Init failed: " << TTF_GetError() << "\n";
         close();
@@ -259,16 +250,14 @@ int main(int argc, char* args[]) {
     std::vector<Platform> platforms;
     srand((unsigned)time(nullptr));
 
-    // Initial platform
     platforms.emplace_back(WALL_WIDTH, player.y - SCREEN_HEIGHT);
 
     bool quit = false;
     bool gameOver = false;
     SDL_Event e;
 
-    // Biến kiểm soát thời gian
     Uint32 lastTime = SDL_GetTicks();
-    const Uint32 frameDelay = 16; // ~60 FPS
+    const Uint32 frameDelay = 16;
 
     while (!quit) {
         Uint32 currentTime = SDL_GetTicks();
@@ -286,9 +275,8 @@ int main(int argc, char* args[]) {
 
         if (!gameOver) {
             player.update();
-            player.updateAnimation(); // Cập nhật animation
+            player.updateAnimation();
 
-            // Check collision with platforms
             for (auto& p : platforms) {
                 if (checkCollision(player.getRect(), p.rect)) {
                     gameOver = true;
@@ -296,9 +284,8 @@ int main(int argc, char* args[]) {
                 }
             }
 
-            // Generate new platforms
             if (platforms.empty() || platforms.back().rect.y > -PLATFORM_HEIGHT) {
-                if (rand() % 100 < 5) { // 5% chance each frame
+                if (rand() % 100 < 5) {
                     bool leftSide = (rand() % 2 == 0);
                     int x = leftSide ? WALL_WIDTH : SCREEN_WIDTH - WALL_WIDTH - PLATFORM_WIDTH;
                     int y = platforms.empty() ? -PLATFORM_HEIGHT : platforms.back().rect.y - 150;
@@ -306,51 +293,41 @@ int main(int argc, char* args[]) {
                 }
             }
 
-            // Remove platforms that are off screen and increase score
             if (!platforms.empty() && platforms.front().rect.y > SCREEN_HEIGHT) {
                 platforms.erase(platforms.begin());
                 player.score++;
             }
 
-            // Move platforms down
             for (auto& p : platforms) {
                 p.rect.y += 3;
             }
         }
 
-        // Render
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        // Draw background between walls
         SDL_Rect bgRect = { WALL_WIDTH, 0, SCREEN_WIDTH - 2 * WALL_WIDTH, SCREEN_HEIGHT };
         SDL_RenderCopy(renderer, backgroundTexture, nullptr, &bgRect);
 
-        // Draw walls
         SDL_Rect leftWall = { 0, 0, WALL_WIDTH, SCREEN_HEIGHT };
         SDL_Rect rightWall = { SCREEN_WIDTH - WALL_WIDTH, 0, WALL_WIDTH, SCREEN_HEIGHT };
         SDL_RenderCopy(renderer, wallTexture, nullptr, &leftWall);
         SDL_RenderCopy(renderer, wallTexture, nullptr, &rightWall);
 
-        // Draw platforms
         for (auto& p : platforms) {
             p.draw();
         }
 
-        // Draw player with animation
         player.draw();
 
-        // Draw score
         renderScore(player.score, font, renderer);
 
-        // Draw game over if needed
         if (gameOver) {
             renderGameOver(font, renderer);
         }
 
         SDL_RenderPresent(renderer);
 
-        // Kiểm soát tốc độ khung hình
         Uint32 frameTime = SDL_GetTicks() - currentTime;
         if (frameDelay > frameTime) {
             SDL_Delay(frameDelay - frameTime);
