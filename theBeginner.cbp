@@ -38,6 +38,15 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="Game.cpp" />
+		<Unit filename="Game.h" />
+		<Unit filename="GameSounds.h" />
+		<Unit filename="GameTextures.h" />
+		<Unit filename="Platform.cpp" />
+		<Unit filename="Platform.h" />
+		<Unit filename="Player.cpp" />
+		<Unit filename="Player.h" />
+		<Unit filename="constants.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

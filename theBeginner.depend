@@ -4,18 +4,8 @@
 	<SDL.h>
 	<SDL_image.h>
 
-1746026299 source:c:\users\duong\onedrive\documents\github\game\main.cpp
-	<SDL.h>
-	<SDL_image.h>
-	<SDL_ttf.h>
-	<SDL_mixer.h>
-	<iostream>
-	<vector>
-	<ctime>
-	<string>
-	<memory>
-	<algorithm>
-	<fstream>
+1746265733 source:c:\users\duong\onedrive\documents\github\game\main.cpp
+	"Game.h"
 
 1741623066 c:\users\duong\onedrive\documents\github\game\src\core\\engine.h
 
@@ -29,4 +19,46 @@
 	<string>
 	"SDL.h"
 	<map>
+
+1746265733 source:c:\users\duong\onedrive\documents\github\game\player.cpp
+	"Player.h"
+	"constants.h"
+
+1746265665 c:\users\duong\onedrive\documents\github\game\player.h
+	<SDL.h>
+	"GameSounds.h"
+	<string>
+	"constants.h"
+
+1746265733 c:\users\duong\onedrive\documents\github\game\gamesounds.h
+	<SDL_mixer.h>
+
+1746265665 c:\users\duong\onedrive\documents\github\game\constants.h
+	<string>
+
+1746265810 c:\users\duong\onedrive\documents\github\game\game.h
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_ttf.h>
+	<SDL_mixer.h>
+	<vector>
+	<string>
+	<iostream>
+	<fstream>
+	"Player.h"
+	"GameTextures.h"
+	"GameSounds.h"
+	"Platform.h"
+	"constants.h"
+
+1746265733 c:\users\duong\onedrive\documents\github\game\gametextures.h
+	<SDL.h>
+
+1746265461 c:\users\duong\onedrive\documents\github\game\platform.h
+	<SDL.h>
+	"constants.h"
+
+1746265665 source:c:\users\duong\onedrive\documents\github\game\platform.cpp
+	"Platform.h"
+	"constants.h"
 
