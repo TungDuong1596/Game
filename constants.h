@@ -26,3 +26,6 @@ const std::string HIGH_SCORE_FILE = "highscore.dat";
 const int SHURIKEN_SPEED = 10;
 const int SHURIKEN_WIDTH = PLAYER_WIDTH / 2;
 const int SHURIKEN_HEIGHT = PLAYER_HEIGHT / 2;
+constexpr int ENEMY_WIDTH = 30;
+constexpr int ENEMY_HEIGHT = 30;
+constexpr int ENEMY_HEALTH = 2;

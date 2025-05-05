@@ -3,7 +3,7 @@
 
 Player::Player() : x(WALL_WIDTH), y(SCREEN_HEIGHT - 100 - PLAYER_HEIGHT), velocityY(0),
                   onLeftWall(true), isJumping(false), isAttached(true), score(0),
-                  scoreMultiplier(1.0f), lives(3), isInvincible(false) {
+                  scoreMultiplier(1.0f), lives(5), isInvincible(false) {
     targetY = y;
     lastMultiplierIncreaseTime = SDL_GetTicks();
     lastScoreUpdateTime = SDL_GetTicks();
@@ -73,7 +73,7 @@ void Player::reset() {
     score = 0;
     scoreMultiplier = 1.0f;
     lastMultiplierIncreaseTime = SDL_GetTicks();
-    lives = 3;
+    lives = 5;
     isInvincible = false;
     lastScoreUpdateTime = SDL_GetTicks();
 }

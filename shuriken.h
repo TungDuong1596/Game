@@ -9,6 +9,7 @@ public:
     void render(SDL_Renderer* renderer, SDL_Texture* texture);
     SDL_Rect getRect() const;
     bool isActive() const;
+    void deactivate() { active = false; }
 
 private:
     SDL_Rect rect;

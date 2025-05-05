@@ -19,6 +19,7 @@ public:
     bool isInvincible;
     std::vector<Shuriken> shurikens;
     static const int MAX_SHURIKENS = 7;
+    Uint32 invincibleTime;
 
     Player();
     void jump(GameSounds& sounds);
@@ -32,7 +33,6 @@ public:
 private:
     int targetY;
     Uint32 lastMultiplierIncreaseTime;
-    Uint32 invincibleTime;
     Uint32 lastScoreUpdateTime;
 };
 

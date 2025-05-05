@@ -6,4 +6,6 @@ struct GameSounds {
     Mix_Chunk* hit = nullptr;
     Mix_Chunk* loseLife = nullptr;
     Mix_Chunk* gameOver = nullptr;
+    Mix_Chunk* kill[5];
+    Mix_Chunk* enemySpawn = nullptr;
 };

@@ -12,6 +12,7 @@
 #include "GameSounds.h"
 #include "Platform.h"
 #include "constants.h"
+#include "enemy.h"
 
 enum class GameState { MENU, PLAYING, PAUSED, GAME_OVER, QUIT };
 
@@ -23,6 +24,9 @@ public:
     bool init();
     void run();
     void handleShurikens();
+    void handleEnemies();
+    void spawnEnemies();
+    void updateKillStreak(bool killedEnemy);
 
 private:
     bool initSDL();
@@ -41,8 +45,8 @@ private:
     bool checkCollision(const SDL_Rect& a, const SDL_Rect& b);
     int loadHighScore();
     void saveHighScore(int score);
-    SDL_Texture* loadTexture(const std::string& path);
 
+    SDL_Texture* loadTexture(const std::string& path);
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
     TTF_Font* font = nullptr;
@@ -54,4 +58,9 @@ private:
     float platformSpeed = INITIAL_PLATFORM_SPEED;
     int highScore = 0;
     bool running = true;
+    std::vector<Enemy> enemies;
+    int killStreak;
+    Uint32 lastKillTime;
+    Uint32 lastSpawnTime;
+    const Uint32 SPAWN_INTERVAL = 5000;
 };

@@ -20,11 +20,11 @@
 	"SDL.h"
 	<map>
 
-1746457137 source:c:\users\duong\onedrive\documents\github\game\player.cpp
+1746459763 source:c:\users\duong\onedrive\documents\github\game\player.cpp
 	"Player.h"
 	"constants.h"
 
-1746456880 c:\users\duong\onedrive\documents\github\game\player.h
+1746460197 c:\users\duong\onedrive\documents\github\game\player.h
 	<SDL.h>
 	"GameSounds.h"
 	<string>
@@ -32,13 +32,13 @@
 	<vector>
 	"shuriken.h"
 
-1746455659 c:\users\duong\onedrive\documents\github\game\gamesounds.h
+1746458742 c:\users\duong\onedrive\documents\github\game\gamesounds.h
 	<SDL_mixer.h>
 
-1746457212 c:\users\duong\onedrive\documents\github\game\constants.h
+1746458742 c:\users\duong\onedrive\documents\github\game\constants.h
 	<string>
 
-1746456837 c:\users\duong\onedrive\documents\github\game\game.h
+1746459383 c:\users\duong\onedrive\documents\github\game\game.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_ttf.h>
@@ -52,8 +52,9 @@
 	"GameSounds.h"
 	"Platform.h"
 	"constants.h"
+	"enemy.h"
 
-1746456837 c:\users\duong\onedrive\documents\github\game\gametextures.h
+1746458742 c:\users\duong\onedrive\documents\github\game\gametextures.h
 	<SDL.h>
 
 1746342579 c:\users\duong\onedrive\documents\github\game\platform.h
@@ -64,7 +65,7 @@
 	"Platform.h"
 	"constants.h"
 
-1746456916 source:c:\users\duong\onedrive\documents\github\game\game.cpp
+1746459094 source:c:\users\duong\onedrive\documents\github\game\game.cpp
 	"Game.h"
 	"constants.h"
 	<algorithm>
@@ -72,7 +73,14 @@
 1746457158 source:c:\users\duong\onedrive\documents\github\game\shuriken.cpp
 	"shuriken.h"
 
-1746457137 c:\users\duong\onedrive\documents\github\game\shuriken.h
+1746459094 c:\users\duong\onedrive\documents\github\game\shuriken.h
+	<SDL.h>
+	"constants.h"
+
+1746458742 source:c:\users\duong\onedrive\documents\github\game\enemy.cpp
+	"enemy.h"
+
+1746458742 c:\users\duong\onedrive\documents\github\game\enemy.h
 	<SDL.h>
 	"constants.h"
 

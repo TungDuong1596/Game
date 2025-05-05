@@ -47,7 +47,11 @@
 		<Unit filename="Player.cpp" />
 		<Unit filename="Player.h" />
 		<Unit filename="constants.h" />
+		<Unit filename="enemy.cpp" />
+		<Unit filename="enemy.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="shuriken.cpp" />
+		<Unit filename="shuriken.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

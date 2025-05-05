@@ -81,16 +81,24 @@ bool Game::loadResources() {
     textures.gameOver = loadTexture("background.png");
     textures.pause = loadTexture("pause.png");
     textures.shuriken = loadTexture("shuriken.png");
+    textures.enemy = loadTexture("enemy.png");
 
     sounds.jump = Mix_LoadWAV("jump.wav");
     sounds.hit = Mix_LoadWAV("hit.wav");
     sounds.loseLife = Mix_LoadWAV("lose_life.wav");
     sounds.gameOver = Mix_LoadWAV("game_over.wav");
+    sounds.kill[0] = Mix_LoadWAV("kill1.wav");
+    sounds.kill[1] = Mix_LoadWAV("kill2.wav");
+    sounds.kill[2] = Mix_LoadWAV("kill3.wav");
+    sounds.kill[3] = Mix_LoadWAV("kill4.wav");
+    sounds.kill[4] = Mix_LoadWAV("kill5.wav");
+    sounds.enemySpawn = Mix_LoadWAV("spawn.wav");
 
     if (!textures.background || !textures.ninja || !textures.wall ||
         !textures.platform || !textures.heart || !textures.menu ||
         !textures.gameOver || !textures.pause ||
-        !sounds.jump || !sounds.hit || !sounds.loseLife || !sounds.gameOver) {
+        !sounds.jump || !sounds.hit || !sounds.loseLife || !sounds.gameOver ||
+        !sounds.kill || !sounds.enemySpawn) {
         return false;
     }
 
@@ -112,6 +120,11 @@ void Game::cleanup() {
     Mix_FreeChunk(sounds.hit);
     Mix_FreeChunk(sounds.loseLife);
     Mix_FreeChunk(sounds.gameOver);
+    SDL_DestroyTexture(textures.enemy);
+    for (int i = 0; i < 5; i++) {
+        Mix_FreeChunk(sounds.kill[i]);
+    }
+    Mix_FreeChunk(sounds.enemySpawn);
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -133,6 +146,51 @@ void Game::handleShurikens() {
         std::remove_if(player.shurikens.begin(), player.shurikens.end(),
             [](const Shuriken& s) { return !s.isActive(); }),
         player.shurikens.end());
+}
+
+void Game::handleEnemies() {
+    spawnEnemies();
+
+    for (auto& enemy : enemies) {
+        enemy.update(platformSpeed);
+    }
+
+    for (auto& shuriken : player.shurikens) {
+        if (!shuriken.isActive()) continue;
+
+        for (auto& enemy : enemies) {
+            if (enemy.isActive() && checkCollision(shuriken.getRect(), enemy.getRect())) {
+                shuriken.deactivate();
+                enemy.takeDamage();
+                if (enemy.isDead()) {
+                    updateKillStreak(true);
+                    player.score += 10;
+                }
+            }
+        }
+    }
+
+    for (auto& enemy : enemies) {
+        if (enemy.isActive() && checkCollision(player.getRect(), enemy.getRect())) {
+            if (!player.isInvincible) {
+                player.lives--;
+                player.isInvincible = true;
+                player.invincibleTime = SDL_GetTicks() + PLAYER_INVINCIBLE_TIME;
+
+                Mix_PlayChannel(-1, sounds.hit, 0);
+
+                if (player.lives <= 0) {
+                    Mix_PlayChannel(-1, sounds.gameOver, 0);
+                    gameState = GameState::GAME_OVER;
+                }
+            }
+        }
+    }
+
+    enemies.erase(
+        std::remove_if(enemies.begin(), enemies.end(),
+            [](const Enemy& e) { return !e.isActive(); }),
+        enemies.end());
 }
 
 void Game::handleEvents() {
@@ -197,6 +255,26 @@ void Game::handleEvents() {
     }
 }
 
+void Game::updateKillStreak(bool killedEnemy) {
+    Uint32 currentTime = SDL_GetTicks();
+
+    if (killedEnemy) {
+        if (currentTime - lastKillTime > 4000) {
+            killStreak = 0;
+        }
+
+        killStreak++;
+        lastKillTime = currentTime;
+
+        if (killStreak > 0 && killStreak <= 5) {
+            Mix_PlayChannel(-1, sounds.kill[killStreak-1], 0);
+        }
+    }
+    else if (currentTime - lastKillTime > 2000) {
+        killStreak = 0;
+    }
+}
+
 void Game::update() {
     if (gameState == GameState::PLAYING) {
         player.update();
@@ -227,6 +305,8 @@ void Game::update() {
 
         handleShurikens();
         spawnPlatform();
+        handleEnemies();
+        updateKillStreak(false);
 
         if (!platforms.empty() && platforms.front().rect.y > SCREEN_HEIGHT) {
             platforms.erase(platforms.begin());
@@ -252,6 +332,10 @@ void Game::render() {
 
     for (auto& shuriken : player.shurikens) {
         shuriken.render(renderer, textures.shuriken);
+    }
+
+    for (auto& enemy : enemies) {
+        enemy.render(renderer, textures.enemy);
     }
 
     for (auto& platform : platforms) {
@@ -357,6 +441,23 @@ void Game::spawnPlatform() {
         int x = leftSide ? WALL_WIDTH : SCREEN_WIDTH - WALL_WIDTH - PLATFORM_WIDTH;
         int y = platforms.empty() ? SCREEN_HEIGHT : platforms.back().rect.y - (rand() % PLATFORM_SPAWN_RANGE_MIN + PLATFORM_SPAWN_RANGE_MAX);
         platforms.emplace_back(x, y);
+    }
+}
+
+void Game::spawnEnemies() {
+    Uint32 currentTime = SDL_GetTicks();
+    if (currentTime - lastSpawnTime > SPAWN_INTERVAL) {
+        lastSpawnTime = currentTime;
+
+        int enemyCount = 2 + rand() % 5;
+        for (int i = 0; i < enemyCount; i++) {
+            bool leftSide = rand() % 2 == 0;
+            int x = leftSide ? WALL_WIDTH : SCREEN_WIDTH - WALL_WIDTH - ENEMY_WIDTH;
+            int y = -ENEMY_HEIGHT - (i * 50);
+            enemies.emplace_back(x, y, leftSide);
+        }
+
+        Mix_PlayChannel(-1, sounds.enemySpawn, 0);
     }
 }
 
