@@ -4,6 +4,7 @@
 struct GameTextures {
     SDL_Texture* background = nullptr;
     SDL_Texture* ninja = nullptr;
+    SDL_Texture* shuriken = nullptr;
     SDL_Texture* wall = nullptr;
     SDL_Texture* platform = nullptr;
     SDL_Texture* heart = nullptr;

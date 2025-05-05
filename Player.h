@@ -3,6 +3,8 @@
 #include "GameSounds.h"
 #include <string>
 #include "constants.h"
+#include <vector>
+#include "shuriken.h"
 
 class Player {
 public:
@@ -15,9 +17,12 @@ public:
     float scoreMultiplier;
     int lives;
     bool isInvincible;
+    std::vector<Shuriken> shurikens;
+    static const int MAX_SHURIKENS = 7;
 
     Player();
     void jump(GameSounds& sounds);
+    void throwShuriken();
     void update();
     void reset();
     void resetPosition();

@@ -22,6 +22,7 @@ public:
 
     bool init();
     void run();
+    void handleShurikens();
 
 private:
     bool initSDL();

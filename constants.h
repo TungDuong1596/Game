@@ -23,3 +23,6 @@ const int PLATFORM_SPAWN_RANGE_MAX = 130;
 const int PLATFORM_SPAWN_GAP_MIN = 40;
 const int PLATFORM_SPAWN_GAP_MAX = 80;
 const std::string HIGH_SCORE_FILE = "highscore.dat";
+const int SHURIKEN_SPEED = 10;
+const int SHURIKEN_WIDTH = PLAYER_WIDTH / 2;
+const int SHURIKEN_HEIGHT = PLAYER_HEIGHT / 2;

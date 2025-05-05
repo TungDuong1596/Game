@@ -20,6 +20,14 @@ void Player::jump(GameSounds& sounds) {
     }
 }
 
+void Player::throwShuriken() {
+    if (isAttached && shurikens.size() < MAX_SHURIKENS) {
+        int centerX = x + PLAYER_WIDTH/2;
+        int centerY = y + PLAYER_HEIGHT/2;
+        shurikens.emplace_back(centerX, centerY);
+    }
+}
+
 void Player::update() {
     if (!isAttached) {
         velocityY += GRAVITY;

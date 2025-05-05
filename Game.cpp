@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "constants.h"
+#include <algorithm>
 
 Game::Game() {}
 
@@ -79,6 +80,7 @@ bool Game::loadResources() {
     textures.menu = loadTexture("menu.png");
     textures.gameOver = loadTexture("background.png");
     textures.pause = loadTexture("pause.png");
+    textures.shuriken = loadTexture("shuriken.png");
 
     sounds.jump = Mix_LoadWAV("jump.wav");
     sounds.hit = Mix_LoadWAV("hit.wav");
@@ -98,6 +100,7 @@ bool Game::loadResources() {
 void Game::cleanup() {
     SDL_DestroyTexture(textures.background);
     SDL_DestroyTexture(textures.ninja);
+    SDL_DestroyTexture(textures.shuriken);
     SDL_DestroyTexture(textures.wall);
     SDL_DestroyTexture(textures.platform);
     SDL_DestroyTexture(textures.heart);
@@ -119,6 +122,17 @@ void Game::cleanup() {
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+}
+
+void Game::handleShurikens() {
+    for (auto& shuriken : player.shurikens) {
+        shuriken.update();
+    }
+
+    player.shurikens.erase(
+        std::remove_if(player.shurikens.begin(), player.shurikens.end(),
+            [](const Shuriken& s) { return !s.isActive(); }),
+        player.shurikens.end());
 }
 
 void Game::handleEvents() {
@@ -145,6 +159,8 @@ void Game::handleEvents() {
                         player.jump(sounds);
                     } else if (event.key.keysym.sym == SDLK_ESCAPE) {
                         gameState = GameState::PAUSED;
+                    } else if (event.key.keysym.sym == SDLK_s) {
+                        player.throwShuriken();
                     }
                 }
                 break;
@@ -209,6 +225,7 @@ void Game::update() {
             }
         }
 
+        handleShurikens();
         spawnPlatform();
 
         if (!platforms.empty() && platforms.front().rect.y > SCREEN_HEIGHT) {
@@ -232,6 +249,10 @@ void Game::render() {
     SDL_Rect rightWall = { SCREEN_WIDTH - WALL_WIDTH, 0, WALL_WIDTH, SCREEN_HEIGHT };
     SDL_RenderCopy(renderer, textures.wall, nullptr, &leftWall);
     SDL_RenderCopy(renderer, textures.wall, nullptr, &rightWall);
+
+    for (auto& shuriken : player.shurikens) {
+        shuriken.render(renderer, textures.shuriken);
+    }
 
     for (auto& platform : platforms) {
         platform.render(renderer, textures.platform);
