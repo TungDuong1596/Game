@@ -35,10 +35,10 @@
 1746458742 c:\users\duong\onedrive\documents\github\game\gamesounds.h
 	<SDL_mixer.h>
 
-1746458742 c:\users\duong\onedrive\documents\github\game\constants.h
+1746523091 c:\users\duong\onedrive\documents\github\game\constants.h
 	<string>
 
-1746459383 c:\users\duong\onedrive\documents\github\game\game.h
+1746522510 c:\users\duong\onedrive\documents\github\game\game.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_ttf.h>
@@ -65,7 +65,7 @@
 	"Platform.h"
 	"constants.h"
 
-1746460136 source:c:\users\duong\onedrive\documents\github\game\game.cpp
+1746523002 source:c:\users\duong\onedrive\documents\github\game\game.cpp
 	"Game.h"
 	"constants.h"
 	<algorithm>

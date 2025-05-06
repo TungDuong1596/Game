@@ -2,7 +2,9 @@
 #include "constants.h"
 #include <algorithm>
 
-Game::Game() {}
+Game::Game() {
+    backgroundOffset = 0.0f;
+}
 
 Game::~Game() {
     cleanup();
@@ -315,6 +317,11 @@ void Game::update() {
         if (platformSpeed < MAX_PLATFORM_SPEED) {
             platformSpeed += SPEED_INCREASE_RATE;
         }
+
+        backgroundOffset += BACKGROUND_SCROLL_SPEED;
+        if (backgroundOffset >= SCREEN_HEIGHT) {
+            backgroundOffset -= SCREEN_HEIGHT;
+        }
     }
 }
 
@@ -322,8 +329,22 @@ void Game::render() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    SDL_Rect bgRect = { WALL_WIDTH, 0, SCREEN_WIDTH - 2 * WALL_WIDTH, SCREEN_HEIGHT };
-    SDL_RenderCopy(renderer, textures.background, nullptr, &bgRect);
+    SDL_Rect bgRect1 = {
+        0,
+        static_cast<int>(backgroundOffset) - SCREEN_HEIGHT,
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT
+    };
+
+    SDL_Rect bgRect2 = {
+        0,
+        static_cast<int>(backgroundOffset),
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT
+    };
+
+    SDL_RenderCopy(renderer, textures.background, nullptr, &bgRect1);
+    SDL_RenderCopy(renderer, textures.background, nullptr, &bgRect2);
 
     SDL_Rect leftWall = { 0, 0, WALL_WIDTH, SCREEN_HEIGHT };
     SDL_Rect rightWall = { SCREEN_WIDTH - WALL_WIDTH, 0, WALL_WIDTH, SCREEN_HEIGHT };
@@ -449,7 +470,7 @@ void Game::spawnEnemies() {
     if (currentTime - lastSpawnTime > SPAWN_INTERVAL) {
         lastSpawnTime = currentTime;
 
-        int enemyCount = 2 + rand() % 5;
+        int enemyCount = 1 + rand() % 5;
         for (int i = 0; i < enemyCount; i++) {
             bool leftSide = rand() % 2 == 0;
             int x = leftSide ? WALL_WIDTH : SCREEN_WIDTH - WALL_WIDTH - ENEMY_WIDTH;

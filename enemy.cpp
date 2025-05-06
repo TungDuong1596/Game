@@ -1,12 +1,12 @@
 #include "enemy.h"
 
 Enemy::Enemy(int x, int y, bool isLeftSide) :
-    leftSide(isLeftSide), active(true), health(2) {  // 2 phi tiêu mới chết
+    leftSide(isLeftSide), active(true), health(1) {
     rect = { x, y, ENEMY_WIDTH, ENEMY_HEIGHT };
 }
 
 void Enemy::update(float speed) {
-    rect.y += static_cast<int>(speed);  // Di chuyển xuống cùng tốc độ platform
+    rect.y += static_cast<int>(speed);
 }
 
 void Enemy::render(SDL_Renderer* renderer, SDL_Texture* texture) {

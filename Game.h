@@ -63,4 +63,6 @@ private:
     Uint32 lastKillTime;
     Uint32 lastSpawnTime;
     const Uint32 SPAWN_INTERVAL = 5000;
+    float backgroundOffset;
+    const float BACKGROUND_SCROLL_SPEED = 0.5f;
 };
