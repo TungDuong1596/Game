@@ -15,39 +15,31 @@
 
 ## 3️⃣ Ngưỡng điểm bạn cho là bạn xứng đáng
 
-Em nghĩ em xứng đáng đạt ___ điểm
-
-## 4️⃣ Lý do bảo vệ ngưỡng điểm đó
-
-- ✅ **Tôi đã hoàn thiện các chức năng chính được yêu cầu.**
-- ✅ **Tôi đã cải tiến game vượt yêu cầu cơ bản:**
-  -
-  -
-  -
-- 📌 **Các điểm nổi bật của game:**
-  - (Liệt kê các điểm mạnh mà bạn tự tin, ví dụ: đồ họa đẹp, gameplay mượt, sáng tạo, v.v.)
+Em nghĩ em xứng đáng đạt 8,5 điểm
 
 ## 🎮 Hướng dẫn chạy game
 
-
-```bash
 - MENU:
-🖱️ Bấm vào màn hình để chơi game
+**🖱️ Bấm vào màn hình để chơi game**
 
 - INGAME:
-⬆️ Nhấn SPACE để nhảy
+**⬆️ Nhấn SPACE để nhảy**
 
-⏸️ Nhấn ESC để dừng game
+**⏸️ Nhấn ESC để dừng game**
+
+**🔫 Nhấn S để bắn**
 
 ⚠️ Bạn chạy càng lâu thì điểm càng tăng lên nhanh cũng đồng thời tốc độ chạy của nhân vật cũng tăng lên nhanh chóng
 
-⚠️ Bạn có 3 mạng nếu chạm vào vật thể bạn sẽ bị mất 1, O mạng = chết
+⚠️ Địch spawn sẽ có tiếng, và bắn chết địch bạn sẽ được kill streak 1 2 3 4 5 có tiếng kill khác nhau (1 shuriken giết được 1 con quái)
+
+⚠️ Bạn có 5 mạng nếu chạm vào vật thể or quái bạn sẽ bị mất 1, O mạng = chết
 
 - ENDGAME:
-🔁 Nhấn R để chơi lại
+**🔁 Nhấn R để chơi lại**
 
-🏠 Nhấn M để quay lại menu
+**🏠 Nhấn M để quay lại menu**
 
-❌ Nhấn ESC để thoát game
+**❌ Nhấn ESC để thoát game**
 
 
